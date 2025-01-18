@@ -55,38 +55,48 @@ namespace EcommerceApplication.Services
                 
             };
 
-            customerOrderMapping.customer.FirstName= customerOrderProductMappings.Select(x=>x.firstName).Distinct().First();
+            customerOrderMapping.customer.FirstName = customerOrderProductMappings.Select(x => x.firstName).Distinct().First();
             customerOrderMapping.customer.LastName = customerOrderProductMappings.Select(x => x.lastName).Distinct().First();
 
-            customerOrderMapping.orderProductMappings.order.OrderId= customerOrderProductMappings.Select(x => x.orderId).Distinct().First();
-            customerOrderMapping.orderProductMappings.order.OrderDate= customerOrderProductMappings.Select(x => x.orderDate).Distinct().First();
-            customerOrderMapping.orderProductMappings.order.DeliveryAddress= customerOrderProductMappings.Select(x => x.deliveryAddress).Distinct().First();
-            customerOrderMapping.orderProductMappings.order.DeliveryExpectedDate= customerOrderProductMappings.Select(x => x.deliveryExpectedDate).Distinct().First();
-            blnGift = customerOrderProductMappings.Select(x => x.isGift).Distinct().First();
-            List<int> orderItemDetailIds = customerOrderProductMappings.Select(x=>x.orderItemId).Distinct().ToList();
-
-            foreach(int orderItemDetailId in orderItemDetailIds)
+            customerOrderMapping.orderProductMappings.order.OrderId = customerOrderProductMappings.Select(x => x.orderId).Distinct().First();
+            //order=0 means no order
+            if (OrderId!=0)
             {
-                string productName = "";
-                if (blnGift == true)
+                
+
+                customerOrderMapping.orderProductMappings.order.OrderId = customerOrderProductMappings.Select(x => x.orderId).Distinct().First();
+                customerOrderMapping.orderProductMappings.order.OrderDate = customerOrderProductMappings.Select(x => x.orderDate).Distinct().First();
+                customerOrderMapping.orderProductMappings.order.DeliveryAddress = customerOrderProductMappings.Select(x => x.deliveryAddress).Distinct().First();
+                customerOrderMapping.orderProductMappings.order.DeliveryExpectedDate = customerOrderProductMappings.Select(x => x.deliveryExpectedDate).Distinct().First();
+                blnGift = customerOrderProductMappings.Select(x => x.isGift).Distinct().First();
+                List<int> orderItemDetailIds = customerOrderProductMappings.Select(x => x.orderItemId).Distinct().ToList();
+
+                foreach (int orderItemDetailId in orderItemDetailIds)
                 {
-                     productName = "Gift";
+                    string productName = "";
+                    if (blnGift == true)
+                    {
+                        productName = "Gift";
+                    }
+                    else
+                    {
+                        productName = customerOrderProductMappings.Where(x => x.orderItemId == orderItemDetailId)
+                      .Select(x => x.productName).FirstOrDefault();
+                    }
+
+                    int quantity = customerOrderProductMappings.Where(x => x.orderItemId == orderItemDetailId)
+                        .Select(x => x.quantity).FirstOrDefault();
+                    decimal price = customerOrderProductMappings.Where(x => x.orderItemId == orderItemDetailId)
+                        .Select(x => x.price).FirstOrDefault();
+                    customerOrderMapping.orderProductMappings.items.Add(new OrderProductMapping
+                    {
+                        ProductName = productName,
+                        Quantity = quantity,
+                        Price = price
+                    });
                 }
-                else
-                {
-                     productName = customerOrderProductMappings.Where(x => x.orderItemId == orderItemDetailId)
-                   .Select(x => x.productName).FirstOrDefault();
-                }
-               
-                int quantity= customerOrderProductMappings.Where(x => x.orderItemId == orderItemDetailId)
-                    .Select(x => x.quantity).FirstOrDefault();
-                decimal price= customerOrderProductMappings.Where(x => x.orderItemId == orderItemDetailId)
-                    .Select(x => x.price).FirstOrDefault();
-                customerOrderMapping.orderProductMappings.items.Add( new OrderProductMapping
-                { ProductName =productName,
-                   Quantity= quantity,
-                   Price= price});
             }
+            
             customerOrder.status = true;
             customerOrder.customerOrderMapping = customerOrderMapping;
 
