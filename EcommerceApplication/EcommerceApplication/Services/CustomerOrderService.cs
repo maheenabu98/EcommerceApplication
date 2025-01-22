@@ -31,7 +31,7 @@ namespace EcommerceApplication.Services
             if (IsValidCustomer)
             {
                 List<CustomerOrderProductMapping> customerOrderMapping = new List<CustomerOrderProductMapping>();
-                customerOrderMapping = await _customerOrderRepository.GetCustomerOrderMapping();
+                customerOrderMapping = await _customerOrderRepository.GetCustomerOrderMapping(customer);
                 customerOrder=GetCustomerOrderResponse(customerOrderMapping);
 
             }

@@ -6,13 +6,13 @@ namespace EcommerceApplication.Repository
 {
     public interface ICustomerOrderDataRepository
     {
-        Task<List<CustomerOrderProductMapping>> GetCustomerOrderMapping();
+        Task<List<CustomerOrderProductMapping>> GetCustomerOrderMapping(Customer customer);
 
         
     }
     public class CustomerOrderDataRepository : ICustomerOrderDataRepository
     {
-        public async Task<List<CustomerOrderProductMapping>> GetCustomerOrderMapping()
+        public async Task<List<CustomerOrderProductMapping>> GetCustomerOrderMapping(Customer customer)
         {
             var customerOrderMappings = new List<CustomerOrderProductMapping>();
 
@@ -22,8 +22,9 @@ namespace EcommerceApplication.Repository
                 {
                     using (SqlCommand cmd = new SqlCommand("GetCustomerOrderDetails", conn)) 
                     {
+                        
                         cmd.CommandType = CommandType.StoredProcedure;
-
+                        cmd.Parameters.AddWithValue("@CustomerId", customer.CustomerId);
                         await conn.OpenAsync();
                         using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                         {
